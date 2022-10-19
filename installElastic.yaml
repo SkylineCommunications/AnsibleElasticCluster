@@ -1,0 +1,77 @@
+---
+- name: Install Cassandra
+  hosts: Elastic
+  become: true
+  vars_files:
+    - /home/ansible/install_elastic/variables/variables.yml
+  tasks:
+    - debug:
+        msg: Install Elastic
+    - name: Update packages
+      ansible.builtin.shell: sudo apt-get update
+    - name: Install snmp package
+      ansible.builtin.shell: sudo apt-get install snmpd
+    - name: Restart the snmp servcie
+      ansible.builtin.shell: sudo service snmpd restart
+    - name: Install java
+      ansible.builtin.shell: sudo apt install openjdk-8-jre -y
+    - name: Download and install the public signing key
+      ansible.builtin.shell: sudo wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add 
+    - name: Get Elastic pacakge
+      ansible.builtin.shell: wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.8.0.deb
+    - name: Install Elastic package
+      ansible.builtin.shell: sudo dpkg -i elasticsearch-6.8.0.deb
+    - name: Pause for 10 mintues so Elastic can start
+      ansible.builtin.pause:
+        minutes: 10
+    - name: Stop the Elastic Service
+      ansible.builtin.command: sudo systemctl stop elasticsearch.service 
+    - debug:
+        msg: Configure configuration files
+    - name: configure yaml
+      template:
+        src: /home/ansible/install_elastic/config/elastic.yaml.j2
+        dest: /etc/elasticsearch/elasticsearch.yaml
+        mode: '0644'
+    - name: configure elasticsearch defaults
+      template:
+        src: /home/ansible/install_elastic/config/elasticdefault.j2
+        dest: /etc/default/elasticsearch
+        mode: '0644'
+    - name: configure elasticsearch service
+      template:
+        src: /home/ansible/install_elastic/config/elasticuser.service.j2
+        dest: /usr/lib/systemd/system/elasticsearch.service
+        mode: '0644'
+    - name: configure java options
+      template:
+        src: /home/ansible/install_elastic/config/jvm.options.j2
+        dest: /etc/elastisearch/jvm.options
+        mode: '0644'
+    - debug:
+        msg: Firewall config
+    - name: add ssh to firewall
+      community.general.ufw:
+        rule: allow
+        port: ssh
+        proto: tcp
+    - name: add port 9200
+      community.general.ufw:
+        rule: allow
+        port: '9200'
+        proto: tcp
+    - name: Add port 9300
+      community.general.ufw:
+        rule: allow
+        port: 9300
+        proto: tcp
+    - name: Enable firewall
+      community.general.ufw:
+        state: enabled
+        
+    - debug:
+        msg: Enable service again
+    - name: reload daemon
+      ansible.builtin.shell: sudo /bin/systemctl daemon-reload
+    - name: start service
+      ansible.builtin.shell: sudo /bin/systemctl enable elasticsearch.service

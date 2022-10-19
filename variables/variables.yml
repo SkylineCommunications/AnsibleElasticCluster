@@ -1,0 +1,10 @@
+---
+clustername: 'dataminerElasticCluster'
+discovery: '["xx.xx.xx.xx","xx.xx.xx.xx]'
+#calculate the amount of masternodes with: (nodes/2)+1
+masternodes: 2
+#set value for Xms and Xmx as followed Xmsxg where second x = memory/2
+xmsram: 'Xms8g'
+xmxram: 'Xmx8g'
+nodename: "{{ansible_default_ipv4.address}}"
+networkhost: "{{ansible_default_ipv4.address}}"
