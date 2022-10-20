@@ -6,6 +6,8 @@ The supported operating system is all the system that are debian based (as we su
 
 The playbook should be executed with elevated rights as some super user actions are needed for the installation.
 
+Note: installed version of elassticsearch is version 6.8.
+
 Before running the playbook some variables need to be set in the variables.yml file.
 
 ## Before running the playbook
@@ -24,7 +26,7 @@ In the variable folder, you'll find the variables.yaml file. Here you will need 
 - discovery : add all the ip addresses that you want in the elasticsearch cluster (these should be the same as in the ansible hosts file)
 - masternodes: calculate the amount of masternodes with: (nodes/2)+1 and fill in the number
 - xmsram: set value for Xms as followed Xmsxg where second x = memory/2 (eg: Xms8g)
-- xmsram: set value for  Xmx as followed Xmxxg where third x = memory/2 (eg: Xms8g)
+- xmsram: set value for  Xmx as followed Xmxxg where third x = memory/2 (eg: Xmx8g)
 
 ### Ansible hosts file
 
